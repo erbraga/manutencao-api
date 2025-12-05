@@ -1,24 +1,30 @@
 from database import db
 
-# Modelo da tabela
-class Manutencao(db.Model):
+class Veiculo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nome_peca = db.Column(db.String(100), nullable=False)
-    intervalo_km = db.Column(db.Integer, nullable=True)
-    intervalo_periodo = db.Column(db.String(50), nullable=True)
-    historico_km = db.Column(db.Integer, nullable=True)
-    historico_periodo = db.Column(db.String(50), nullable=True)
-    revisao_km = db.Column(db.Integer, nullable=True)
-    revisao_periodo = db.Column(db.String(50), nullable=True)
+    descricao = db.Column(db.String(50), nullable=False)
+
+    def to_dict(self):
+        return{
+            'id': self.id,
+            'descricao': self.descricao
+        }
+
+
+class Itens(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    descricao = db.Column(db.String(100), nullable=False)
+    intervalo_km = db.Column(db.Integer, nullable=False)
+    intervalo_prazo = db.Column(db.Integer, nullable=False)
+    ultima_troca_km = db.Column(db.Integer, nullable=False)
+    ultima_troca_data = db.Column(db.Date, nullable=False)
 
     def to_dict(self):
         return {
             "id": self.id,
-            "nome_peca": self.nome_peca,
+            "descricao": self.descricao,
             "intervalo_km": self.intervalo_km,
-            "intervalo_periodo": self.intervalo_periodo,
-            "historico_km": self.historico_km,
-            "historico_periodo": self.historico_periodo,
-            "revisao_km": self.revisao_km,
-            "revisao_periodo": self.revisao_periodo
+            "intervalo_prazo": self.intervalo_prazo,
+            "ultima_troca_km": self.ultima_troca_km,
+            "ultima_troca_data": self.ultima_troca_data.isoformat(),
         }
