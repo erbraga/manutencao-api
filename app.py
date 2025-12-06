@@ -66,6 +66,14 @@ def salvar():
               type: string
               format: date
               example: "2025-12-04"
+            proxima_troca_km:
+              type: integer
+            proxima_troca_data:
+              type: string
+              format: date
+              example: "2025-12-04"
+            veiculo:
+              type: int
     responses:
       201:
         description: Registro salvo com sucesso!
@@ -77,7 +85,11 @@ def salvar():
         intervalo_prazo=data.get("intervalo_prazo"),
         ultima_troca_km=data.get("ultima_troca_km"),
         ultima_troca_data=datetime.strptime(data["ultima_troca_data"],
-                                            "%Y-%m-%d").date()
+                                            "%Y-%m-%d").date(),
+        proxima_troca_km=data.get("ultima_troca_km"),
+        proxima_troca_data=datetime.strptime(data["ultima_troca_data"],
+                                            "%Y-%m-%d").date(),
+        veiculo=data.get("veiculo"),
     )
     db.session.add(novo)
     db.session.commit()
@@ -114,6 +126,14 @@ def editar(id):
               type: string
               format: date
               example: "2025-12-04"
+            proxima_troca_km:
+              type: integer
+            proxima_troca_data:
+              type: string
+              format: date
+              example: "2025-12-04"
+            veiculo:
+              type: int
     responses:
       201:
         description: Registro atualizado com sucesso!
@@ -126,8 +146,12 @@ def editar(id):
     registro.intervalo_km = data.get("intervalo_km", registro.intervalo_km)
     registro.intervalo_prazo = data.get("intervalo_prazo", registro.intervalo_prazo)
     registro.ultima_troca_km = data.get("ultima_troca_km", registro.ultima_troca_km)
-    registro.ultima_troca_data = datetime.strptime(data["ultima_troca_data"], 
+    registro.ultima_troca_data = datetime.strptime(data["ultima_troca_data"],
                                           "%Y-%m-%d").date()
+    registro.proxima_troca_km = data.get("proxima_troca_km", registro.proxima_troca_km)
+    registro.proxima_troca_data = datetime.strptime(data["proxima_troca_data"],
+                                          "%Y-%m-%d").date()
+    registro.veiculo = data.get("veiculo", registro.veiculo)
     db.session.commit()
     return jsonify({"message": "Registro atualizado com sucesso!"})
 
@@ -146,14 +170,17 @@ def deletar(id):
         description: ID do item
 
     responses:
-      201:
+      200:
         description: Registro salvo com sucesso!
+      404:
+        description: Registro não encontrado!
     """
 
     registro = Itens.query.get_or_404(id)
     db.session.delete(registro)
     db.session.commit()
     return jsonify({"message": "Registro deletado com sucesso!"})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
