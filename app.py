@@ -4,7 +4,7 @@ from flasgger import Swagger
 from datetime import datetime
 
 from database import db
-from models import Itens
+from models import Itens, Veiculo
 
 app = Flask(__name__)
 swagger = Swagger(app)
@@ -21,33 +21,33 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# Rota para listar registros
-@app.route('/listar', methods=['GET'])
-def listar():
-    """Retorna todos os ítens cadastrados.
+# Rota para recuperar os registros
+@app.route('/recuperar', methods=['GET'])
+def recuperar():
+    '''Retorna todo o banco de dados cadastrado.
     ---
 
     responses:
       200:
         description: Retorna a lista de todos os itens de manutnção cadastrados no banco de dados
-    """
-    registros = Itens.query.all()
-    return jsonify([r.to_dict() for r in registros])
+    '''
 
-# Rota para salvar novo registro
+    itens= [item.to_dict() for item in Itens.query.all()]
+    veiculo = [veiculo.to_dict() for veiculo in Veiculo.query.all()]
+    
+    return jsonify({'veiculo':veiculo,
+                    'itens':itens})
+
+
+# Rota para salvar novo item de manutenção
 @app.route('/salvar', methods=['POST'])
 def salvar():
 
-    """Salva o registro no banco de dados
+    '''Salva novo item de manutenção no banco de dados
     ---
     consumes:
       - application/json
     parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-        description: ID do item
       - in: body
         name: body
         required: true
@@ -56,49 +56,57 @@ def salvar():
           properties:
             descricao:
               type: string
+              example: Óleo do motor
             intervalo_km:
               type: integer
+              example: 10000
             intervalo_prazo:
               type: integer
+              example: 12
             ultima_troca_km:
               type: integer
+              example: 10000
             ultima_troca_data:
               type: string
               format: date
-              example: "2025-12-04"
+              example: "2023-12-04"
             proxima_troca_km:
               type: integer
+              example: 20000
             proxima_troca_data:
               type: string
               format: date
-              example: "2025-12-04"
+              example: "2024-11-25"
             veiculo:
               type: int
+              example: 1
     responses:
       201:
         description: Registro salvo com sucesso!
-    """
-    data = request.json
-    novo = Itens(
-        descricao=data.get("descricao"),
-        intervalo_km=data.get("intervalo_km"),
-        intervalo_prazo=data.get("intervalo_prazo"),
-        ultima_troca_km=data.get("ultima_troca_km"),
-        ultima_troca_data=datetime.strptime(data["ultima_troca_data"],
-                                            "%Y-%m-%d").date(),
-        proxima_troca_km=data.get("ultima_troca_km"),
-        proxima_troca_data=datetime.strptime(data["ultima_troca_data"],
-                                            "%Y-%m-%d").date(),
-        veiculo=data.get("veiculo"),
+    '''
+
+    dados_recebidos = request.json
+    novo_registro = Itens(
+        descricao=dados_recebidos.get('descricao'),
+        intervalo_km=dados_recebidos.get('intervalo_km'),
+        intervalo_prazo=dados_recebidos.get('intervalo_prazo'),
+        ultima_troca_km=dados_recebidos.get('ultima_troca_km'),
+        ultima_troca_data=datetime.strptime(dados_recebidos['ultima_troca_data'],
+                                            '%Y-%m-%d').date(),
+        proxima_troca_km=dados_recebidos.get('ultima_troca_km'),
+        proxima_troca_data=datetime.strptime(dados_recebidos['ultima_troca_data'],
+                                            '%Y-%m-%d').date(),
+        veiculo=dados_recebidos.get('veiculo'),
     )
-    db.session.add(novo)
+    db.session.add(novo_registro)
     db.session.commit()
-    return jsonify({"message": "Registro salvo com sucesso!"}), 201
+    return jsonify({'mensagem': 'Registro salvo com sucesso!'}), 201
+
 
 # Rota para editar registro
-@app.route('/editar/<int:id>', methods=['PUT'])
-def editar(id):
-    """Altera o registro no banco de dados
+@app.route('/alterar-item/<int:id>', methods=['PUT'])
+def alterar_item(id):
+    '''Altera um item de manutenção no banco de dados
     ---
     consumes:
       - application/json
@@ -116,49 +124,56 @@ def editar(id):
           properties:
             descricao:
               type: string
+              example: Óleo do motor
             intervalo_km:
               type: integer
+              example: 10000
             intervalo_prazo:
               type: integer
+              example: 12
             ultima_troca_km:
               type: integer
+              example: 10000
             ultima_troca_data:
               type: string
               format: date
-              example: "2025-12-04"
+              example: "2023-12-04"
             proxima_troca_km:
               type: integer
+              example: 20000
             proxima_troca_data:
               type: string
               format: date
-              example: "2025-12-04"
+              example: "2024-11-25"
             veiculo:
               type: int
+              example: 1
     responses:
       201:
         description: Registro atualizado com sucesso!
-    """
+    '''
 
-    data = request.json
+    dados_recebidos = request.json
     registro = Itens.query.get_or_404(id)
 
-    registro.descricao = data.get("descricao", registro.descricao)
-    registro.intervalo_km = data.get("intervalo_km", registro.intervalo_km)
-    registro.intervalo_prazo = data.get("intervalo_prazo", registro.intervalo_prazo)
-    registro.ultima_troca_km = data.get("ultima_troca_km", registro.ultima_troca_km)
-    registro.ultima_troca_data = datetime.strptime(data["ultima_troca_data"],
-                                          "%Y-%m-%d").date()
-    registro.proxima_troca_km = data.get("proxima_troca_km", registro.proxima_troca_km)
-    registro.proxima_troca_data = datetime.strptime(data["proxima_troca_data"],
-                                          "%Y-%m-%d").date()
-    registro.veiculo = data.get("veiculo", registro.veiculo)
+    registro.descricao = dados_recebidos.get('descricao', registro.descricao)
+    registro.intervalo_km = dados_recebidos.get('intervalo_km', registro.intervalo_km)
+    registro.intervalo_prazo = dados_recebidos.get('intervalo_prazo', registro.intervalo_prazo)
+    registro.ultima_troca_km = dados_recebidos.get('ultima_troca_km', registro.ultima_troca_km)
+    registro.ultima_troca_data = datetime.strptime(dados_recebidos['ultima_troca_data'],
+                                          '%Y-%m-%d').date()
+    registro.proxima_troca_km = dados_recebidos.get('proxima_troca_km', registro.proxima_troca_km)
+    registro.proxima_troca_data = datetime.strptime(dados_recebidos['proxima_troca_data'],
+                                          '%Y-%m-%d').date()
+    registro.veiculo = dados_recebidos.get('veiculo', registro.veiculo)
     db.session.commit()
-    return jsonify({"message": "Registro atualizado com sucesso!"})
+    return jsonify({'mensagem': 'Registro atualizado com sucesso!'})
+
 
 # Rota para deletar registro
-@app.route('/del/<int:id>', methods=['DELETE'])
+@app.route('/deletar/<int:id>', methods=['DELETE'])
 def deletar(id):
-    """Deleta o registro no banco de dados
+    '''Deleta o registro no banco de dados
     ---
     consumes:
       - application/json
@@ -171,15 +186,52 @@ def deletar(id):
 
     responses:
       200:
-        description: Registro salvo com sucesso!
+        description: Registro deletado com sucesso!
       404:
         description: Registro não encontrado!
-    """
+    '''
 
     registro = Itens.query.get_or_404(id)
     db.session.delete(registro)
     db.session.commit()
-    return jsonify({"message": "Registro deletado com sucesso!"})
+    return jsonify({'mensagem': 'Registro deletado com sucesso!'})
+
+
+# Rota para editar veiculo
+@app.route('/alterar-veiculo/<int:id>', methods=['PUT'])
+def alterar_veiculo(id):
+    '''Altera um veiculo no banco de dados
+    ---
+    consumes:
+      - application/json
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID do veículo
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            descricao:
+              type: string
+              example: Ferrari F40
+    responses:
+      201:
+        description: Registro atualizado com sucesso!
+      404:
+        description: Registro não encontrado
+    '''
+
+    dados_recebidos = request.json
+    registro = Veiculo.query.get_or_404(id)
+
+    registro.descricao = dados_recebidos.get('descricao', registro.descricao)
+    db.session.commit()
+    return jsonify({'mensagem': 'Registro atualizado com sucesso!'})
 
 
 if __name__ == '__main__':
