@@ -18,8 +18,8 @@ class Itens(db.Model):
     intervalo_prazo = db.Column(db.Integer, nullable=False)
     ultima_troca_km = db.Column(db.Integer, nullable=False)
     ultima_troca_data = db.Column(db.Date, nullable=False)
-    veiculo = db.Column(db.Integer, db.ForeignKey('veiculo.id'), nullable=False)
-    veiculo_relacionamento = db.relationship('Veiculo', backref=db.backref('itens', lazy=True))
+    veiculo = db.Column(db.Integer, db.ForeignKey('veiculos.id'), nullable=False)
+    veiculo_relacionamento = db.relationship('Veiculos', backref=db.backref('itens', lazy=True))
 
     def to_dict(self):
         return {
