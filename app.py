@@ -2,9 +2,8 @@ from flask import Flask, request, jsonify
 from flasgger import Swagger
 from flask_cors import CORS
 from datetime import datetime
-
 from database import db
-from models import Itens, Veiculo
+from models import Itens, Veiculos
 
 app = Flask(__name__)
 CORS(app)
@@ -34,15 +33,15 @@ def recuperar():
     '''
 
     itens= [item.to_dict() for item in Itens.query.all()]
-    veiculo = [veiculo.to_dict() for veiculo in Veiculo.query.all()]
+    veiculo = [veiculo.to_dict() for veiculo in Veiculos.query.all()]
     
     return jsonify({'veiculo':veiculo,
                     'itens':itens})
 
 
 # Rota para salvar novo item de manutenção
-@app.route('/salvar', methods=['POST'])
-def salvar():
+@app.route('/salvar-item', methods=['POST'])
+def salvar_item():
 
     '''Salva novo item de manutenção no banco de dados
     ---
@@ -71,13 +70,6 @@ def salvar():
               type: string
               format: date
               example: "2023-12-04"
-            proxima_troca_km:
-              type: integer
-              example: 20000
-            proxima_troca_data:
-              type: string
-              format: date
-              example: "2024-11-25"
             veiculo:
               type: int
               example: 1
@@ -94,14 +86,12 @@ def salvar():
         ultima_troca_km=dados_recebidos.get('ultima_troca_km'),
         ultima_troca_data=datetime.strptime(dados_recebidos['ultima_troca_data'],
                                             '%Y-%m-%d').date(),
-        proxima_troca_km=dados_recebidos.get('ultima_troca_km'),
-        proxima_troca_data=datetime.strptime(dados_recebidos['ultima_troca_data'],
-                                            '%Y-%m-%d').date(),
         veiculo=dados_recebidos.get('veiculo'),
     )
     db.session.add(novo_registro)
     db.session.commit()
-    return jsonify({'mensagem': 'Registro salvo com sucesso!'}), 201
+    return jsonify({'mensagem': 'Registro salvo com sucesso!',
+                   'ID':novo_registro.id}), 201
 
 
 # Rota para editar registro
@@ -139,13 +129,6 @@ def alterar_item(id):
               type: string
               format: date
               example: "2023-12-04"
-            proxima_troca_km:
-              type: integer
-              example: 20000
-            proxima_troca_data:
-              type: string
-              format: date
-              example: "2024-11-25"
             veiculo:
               type: int
               example: 1
@@ -163,17 +146,14 @@ def alterar_item(id):
     registro.ultima_troca_km = dados_recebidos.get('ultima_troca_km', registro.ultima_troca_km)
     registro.ultima_troca_data = datetime.strptime(dados_recebidos['ultima_troca_data'],
                                           '%Y-%m-%d').date()
-    registro.proxima_troca_km = dados_recebidos.get('proxima_troca_km', registro.proxima_troca_km)
-    registro.proxima_troca_data = datetime.strptime(dados_recebidos['proxima_troca_data'],
-                                          '%Y-%m-%d').date()
     registro.veiculo = dados_recebidos.get('veiculo', registro.veiculo)
     db.session.commit()
     return jsonify({'mensagem': 'Registro atualizado com sucesso!'})
 
 
 # Rota para deletar registro
-@app.route('/deletar/<int:id>', methods=['DELETE'])
-def deletar(id):
+@app.route('/deletar-item/<int:id>', methods=['DELETE'])
+def deletar_item(id):
     '''Deleta o registro no banco de dados
     ---
     consumes:
@@ -197,6 +177,37 @@ def deletar(id):
     db.session.commit()
     return jsonify({'mensagem': 'Registro deletado com sucesso!'})
 
+# Rota para salvar novo veiculo
+@app.route('/salvar-veiculo', methods=['POST'])
+def salvar_veiculo():
+
+    '''Salva novo veiculo no banco de dados
+    ---
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            descricao:
+              type: string
+              example: Nissan Versa
+    responses:
+      201:
+        description: Registro salvo com sucesso!
+    '''
+
+    dados_recebidos = request.json
+    novo_registro = Veiculos(
+        descricao=dados_recebidos.get('descricao'),
+    )
+    db.session.add(novo_registro)
+    db.session.commit()
+    return jsonify({'mensagem': 'Registro salvo com sucesso!',
+                    'id':novo_registro.id}), 201
 
 # Rota para editar veiculo
 @app.route('/alterar-veiculo/<int:id>', methods=['PUT'])
@@ -228,11 +239,37 @@ def alterar_veiculo(id):
     '''
 
     dados_recebidos = request.json
-    registro = Veiculo.query.get_or_404(id)
+    registro = Veiculos.query.get_or_404(id)
 
     registro.descricao = dados_recebidos.get('descricao', registro.descricao)
     db.session.commit()
     return jsonify({'mensagem': 'Registro atualizado com sucesso!'})
+
+# Rota para deletar registro
+@app.route('/deletar-veiculo/<int:id>', methods=['DELETE'])
+def deletar_veiculo(id):
+    '''Deleta o registro no banco de dados
+    ---
+    consumes:
+      - application/json
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID do item
+
+    responses:
+      200:
+        description: Registro deletado com sucesso!
+      404:
+        description: Registro não encontrado!
+    '''
+
+    registro = Veiculos.query.get_or_404(id)
+    db.session.delete(registro)
+    db.session.commit()
+    return jsonify({'mensagem': 'Registro deletado com sucesso!'})
 
 
 if __name__ == '__main__':
