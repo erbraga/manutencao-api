@@ -6,13 +6,13 @@ from database import db
 from models import Itens, Veiculos
 
 app = Flask(__name__)
-CORS(app)
-swagger = Swagger(app)
-
 
 # Configuração do banco de dados SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///manutencao.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+CORS(app, resources={r"/*": {"origins": "*"}})
+swagger = Swagger(app)
 
 # Inicializa o banco de dados
 db.init_app(app)
@@ -40,7 +40,7 @@ def recuperar():
 
 
 # Rota para salvar novo item de manutenção
-@app.route('/salvar-item', methods=['POST'])
+@app.route('/salvar-item', methods=['POST', 'OPTIONS'])
 def salvar_item():
 
     '''Salva novo item de manutenção no banco de dados
@@ -77,7 +77,8 @@ def salvar_item():
       201:
         description: Registro salvo com sucesso!
     '''
-
+    if request.method == 'OPTIONS':
+      return {},200
     dados_recebidos = request.json
     novo_registro = Itens(
         descricao=dados_recebidos.get('descricao'),
@@ -152,7 +153,8 @@ def alterar_item(id):
 
 
 # Rota para deletar registro
-@app.route('/deletar-item/<int:id>', methods=['DELETE'])
+@app.route('/deletar-item/<int:id>', methods=['DELETE', 'OPTIONS'])
+#@cross_origin()
 def deletar_item(id):
     '''Deleta o registro no banco de dados
     ---
@@ -171,6 +173,8 @@ def deletar_item(id):
       404:
         description: Registro não encontrado!
     '''
+    if request.method == 'OPTIONS':
+        return {}, 200
 
     registro = Itens.query.get_or_404(id)
     db.session.delete(registro)
