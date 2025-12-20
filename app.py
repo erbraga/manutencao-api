@@ -79,6 +79,7 @@ def salvar_item():
     '''
     if request.method == 'OPTIONS':
       return {},200
+    
     dados_recebidos = request.json
     novo_registro = Itens(
         descricao=dados_recebidos.get('descricao'),
@@ -182,7 +183,7 @@ def deletar_item(id):
     return jsonify({'mensagem': 'Registro deletado com sucesso!'})
 
 # Rota para salvar novo veiculo
-@app.route('/salvar-veiculo', methods=['POST'])
+@app.route('/salvar-veiculo', methods=['POST', 'OPTIONS'])
 def salvar_veiculo():
 
     '''Salva novo veiculo no banco de dados
@@ -203,7 +204,10 @@ def salvar_veiculo():
       201:
         description: Registro salvo com sucesso!
     '''
-
+    
+    if request.method == 'OPTIONS':
+      return {},200
+        
     dados_recebidos = request.json
     novo_registro = Veiculos(
         descricao=dados_recebidos.get('descricao'),
