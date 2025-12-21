@@ -4,6 +4,7 @@ from flask_cors import CORS
 from datetime import datetime
 from database import db
 from models import Itens, Veiculos
+from werkzeug.exceptions import NotFound
 
 app = Flask(__name__)
 
@@ -29,7 +30,7 @@ def recuperar():
 
     responses:
       200:
-        description: Retorna a lista de todos os itens de manutnção cadastrados no banco de dados
+        description: Registros lidos com sucesso.
     '''
 
     itens= [item.to_dict() for item in Itens.query.all()]
@@ -75,7 +76,8 @@ def salvar_item():
               example: 1
     responses:
       201:
-        description: Registro salvo com sucesso!
+        description: id do registro salvo
+        
     '''
     if request.method == 'OPTIONS':
       return {},200
@@ -92,8 +94,7 @@ def salvar_item():
     )
     db.session.add(novo_registro)
     db.session.commit()
-    return jsonify({'mensagem': 'Registro salvo com sucesso!',
-                   'id':novo_registro.id}), 201
+    return jsonify({'id':novo_registro.id}), 201
 
 
 # Rota para editar registro
@@ -135,12 +136,18 @@ def alterar_item(id):
               type: int
               example: 1
     responses:
-      201:
+      200:
         description: Registro atualizado com sucesso!
+      404: 
+        description: Registro não encontrado!
     '''
-
+    
     dados_recebidos = request.json
-    registro = Itens.query.get_or_404(id)
+    try:
+        registro = Itens.query.get_or_404(id)
+    except NotFound:
+        return jsonify({"404": "Item não encontrado"}), 404
+        
 
     registro.descricao = dados_recebidos.get('descricao', registro.descricao)
     registro.intervalo_km = dados_recebidos.get('intervalo_km', registro.intervalo_km)
@@ -150,7 +157,7 @@ def alterar_item(id):
                                           '%Y-%m-%d').date()
     registro.veiculo = dados_recebidos.get('veiculo', registro.veiculo)
     db.session.commit()
-    return jsonify({'mensagem': 'Registro atualizado com sucesso!'})
+    return jsonify({'200': 'Registro atualizado com sucesso!'})
 
 
 # Rota para deletar registro
@@ -176,8 +183,11 @@ def deletar_item(id):
     '''
     if request.method == 'OPTIONS':
         return {}, 200
-
-    registro = Itens.query.get_or_404(id)
+    try:
+        registro = Itens.query.get_or_404(id)
+    except NotFound:
+        return jsonify({"404": "Item não encontrado"}), 404
+        
     db.session.delete(registro)
     db.session.commit()
     return jsonify({'mensagem': 'Registro deletado com sucesso!'})
@@ -202,7 +212,7 @@ def salvar_veiculo():
               example: Nissan Versa
     responses:
       201:
-        description: Registro salvo com sucesso!
+        description: id do registro salvo
     '''
     
     if request.method == 'OPTIONS':
@@ -214,8 +224,7 @@ def salvar_veiculo():
     )
     db.session.add(novo_registro)
     db.session.commit()
-    return jsonify({'mensagem': 'Registro salvo com sucesso!',
-                    'id':novo_registro.id}), 201
+    return jsonify({'id':novo_registro.id}), 201
 
 # Rota para editar veiculo
 @app.route('/alterar-veiculo/<int:id>', methods=['PUT'])
@@ -240,15 +249,18 @@ def alterar_veiculo(id):
               type: string
               example: Ferrari F40
     responses:
-      201:
+      200:
         description: Registro atualizado com sucesso!
       404:
         description: Registro não encontrado
     '''
 
     dados_recebidos = request.json
-    registro = Veiculos.query.get_or_404(id)
-
+    try:
+      registro = Veiculos.query.get_or_404(id)
+    except NotFound:
+        return jsonify({"404": "Item não encontrado"}), 404
+    
     registro.descricao = dados_recebidos.get('descricao', registro.descricao)
     db.session.commit()
     return jsonify({'mensagem': 'Registro atualizado com sucesso!'})
@@ -272,12 +284,26 @@ def deletar_veiculo(id):
         description: Registro deletado com sucesso!
       404:
         description: Registro não encontrado!
-    '''
+      500:
+        description: Registro associado a uma chave estrangeira
 
-    registro = Veiculos.query.get_or_404(id)
-    db.session.delete(registro)
-    db.session.commit()
-    return jsonify({'mensagem': 'Registro deletado com sucesso!'})
+    '''
+    try:
+        registro = Veiculos.query.get_or_404(id)
+    except NotFound:
+        return jsonify({"404": "Item não encontrado"}), 404
+    
+    try:
+        db.session.delete(registro)
+        db.session.commit()
+        return jsonify({'200': 'Registro deletado com sucesso!'})
+    
+    except:
+        db.session.rollback()
+        return jsonify({"500": "Registro associado a uma chave estrangeira"}), 500
+
+    
+    
 
 
 if __name__ == '__main__':

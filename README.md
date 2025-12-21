@@ -1,46 +1,123 @@
-# Minha API
+# manutencao-api
 
-Este pequeno projeto faz parte do material diático da Disciplina **Desenvolvimento Full Stack Básico** 
+<br>
 
-O objetivo aqui é ilustrar o conteúdo apresentado ao longo das três aulas da disciplina.
+## Descrição
 
----
-## Como executar 
+Este projeto foi produzido como entrega final do módulo **Desenvolvimento Full Stack Básico** do curso de **Especialização em Desenvovimento Web** da PUC Rio, trata-se de um MVP (mínimo produto viável) desenvolvido no formato SPA (Single page application ou aplicação em página única) com o objetivo de dar suporte à gestão de manutenções de veículos.
+
+Esta  aplicação é uma API desenvolvida em conjunto com uma página web que consome os dados por ela disponibilizados, no entanto, pode ser consumida por outras aplicações por meio de requisições HTTP, conforme demonstrado neste documento. 
+
+<br>
+
+## Instalação
+
+A API foi desenvolvida na linguagem Python, utilizando o framework Flask. Para executá-la é preciso que o interpretador Python esteja instalado no computador, assim como todas as  dependências (bibliotecas utilizadas no código da aplicação). Para tanto é necessário seguir os passos abaixo:
+
+1. Garantir que o interpretador Python esteja instalado.
+
+    As principais distribuições Linux já vêm com o interpretador Python instalado em uma versão razoavelmente atual, como é o caso do Ubuntu, distribuição Linux utilizada para criação do projeto. No Windows será necessário instalá-lo, caso não tenha feito antes, se for o caso acesse https://www.python.org/downloads/windows/ e siga as instruções apresentadas.
+
+2. Fazer o download da aplicação em https://github.com/erbraga/manutencao-api/archive/refs/heads/main.zip e extraia o diretório compactado no HD.
+
+3. Abrir o terminal e executar os comandos abaixo para criar e ativar o ambiente virtual e instalar as dependências.
+    
+    No Ubuntu:
+    ```
+    cd ./ manutencao-api
+    python3 -m venv .venv
+    source ./.bin/activate
+    pip install -r requirements.txt
+    ```
+    
+    No Windows:
+    ```
+    cd manutencao-api
+    py -m venv .venv
+    .venv\Scripts\activate.bat
+    pip install -r requirements.txt
+    ```
+
+<br>
+
+## Como executar
+Após a criação e ativação do ambiente virtual a aplicação pode ser executada por meio do comando ``` flask run  ```. 
+
+<br>
+
+## Como utilizar
+
+A APi pode ser consumida por meio de requisições HTML para as rotas definidas.
+Como a aplicação foi desenvolvida para fins acadêmicos, está hospedada em servidor local, por isso o domínio é *127.0.0.1:5000* e as rotas são:
+
+*/recuperar*
+
+|Método|GET|
+|-|-|
+|Funcionalidade|Retorna em um arquivo **JSON** todos os registros das 2 tabelas definidas no Banco de dados.|
+|Retorno|Arquivo **JSON** com todos os registros das 2 tabelas definidas no Banco de dados.
+
+<br>
+
+*/alterar-item/{id}*
+|Método|PUT|
+|-|-|
+|Parâmetro|id => chave primária da tabela itens.|
+|Funcionalidade|Altera um registro da tabela itens cuja chave primária seja igual a *id*. Os valores são enviados no corpo da requisição.|
+|Retorno|200 - Registro atualizado com sucesso!<br>404 - Registro não encontrado|
+
+<br>
+
+*/alterar-veiculo/{id}*
+|Método|PUT|
+|-|-|
+|Parâmetro|id => chave primária da tabela veiculos.|
+|Funcionalidade|Altera um registro da tabela veiculos cuja chave primária seja igual a *id*. Os valores são enviados no corpo da requisição.|
+|Retorno|200 - Registro atualizado com sucesso!<br>404 - Registro não encontrado|
+
+<br>
+
+*/deletar-item​/{id}*
+|Método: |DELETE|
+|-|-|
+|Parâmetro| id => chave primária da tabela itens.|
+|Funcionalidade|Exclui um registro da tabela itens cuja chave primária seja igual a *id*.|
+|Retorno|200 - Registro atualizado com sucesso!<br>404 - Registro não encontrado|
+
+<br>
+
+*/deletar-veiculo/{id}*
+|Método: |DELETE|
+|-|-|
+|Parâmetro| id => chave primária da tabela veiculos.|
+|Funcionalidade|Exclui um registro da tabela itens cuja chave primária seja igual a *id*.|
+|Retorno|200 - Registro atualizado com sucesso!<br>404 - Registro não encontrado|
+
+<br>
+
+*/salvar-item/*
+|Método|PUT|
+|-|-|
+|Parâmetro|id => chave primária da tabela itens.|
+|Funcionalidade|Salva um novo registro na tabela itens. Os valores são enviados no corpo da requisição.|
+|Retorno|200 - Registro atualizado com sucesso!<br>404 - Registro não encontrado|
+
+<br>
+
+*/salvar-veiculo/*
+|Método|PUT|
+|-|-|
+|Parâmetro|id => chave primária da tabela veiculos.|
+|Funcionalidade|Salva um novo registro na tabela veiculos. Os valores são enviados no corpo da requisição.
+|Retorno|200 - Registro atualizado com sucesso!<br>404 - Registro não encontrado|
+
+<br>
+
+## Tecnologias utilizadas
 
 
-Será necessário ter todas as libs python listadas no `requirements.txt` instaladas.
-Após clonar o repositório, é necessário ir ao diretório raiz, pelo terminal, para poder executar os comandos descritos abaixo.
-
-> É fortemente indicado o uso de ambientes virtuais do tipo [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html).
-
-```
-(env)$ pip install -r requirements.txt
-```
-
-Este comando instala as dependências/bibliotecas, descritas no arquivo `requirements.txt`.
-
-Para executar a API  basta executar:
-
-```
-(env)$ flask run --host 0.0.0.0 --port 5000
-```
-
-Em modo de desenvolvimento é recomendado executar utilizando o parâmetro reload, que reiniciará o servidor
-automaticamente após uma mudança no código fonte. 
-
-```
-(env)$ flask run --host 0.0.0.0 --port 5000 --reload
-```
-
-Abra o [http://localhost:5000/#/](http://localhost:5000/#/) no navegador para verificar o status da API em execução.
-
-
-
-
-
-
-
-
-
-
-Api para alimentar uma aplicação de controle de manutenção de veículo. faz parte do primeiro MVP para o curso de pós graduação em desenvolvimento web na PUC Rio e deverá ser consumida por uma aplicação front end.
+- **HTTP:** Protocolo de transmissão de dados utilizada para troca de dados entre o cliente e o servidor em uma aplicação web.
+- **Python:** Linguagem de programação interpretada que suporta mais de um paradigma de programação e pode ser utilizada para várias aplicações.
+- **Flask:** Biblioteca que possibilita utilizar Python para programar aplicações para web.
+- **Github:** Ferramenta de versionamento, que permite criar diversas versões do código durante o desenvolvimento da aplicação, além do seu compartilhamento.
+- **Visual Studio Code (VSCode):** Ambiente de desenvolvimento integrado (IDE) que permite editar todo o código do projeto, escrito em diferentes linguagens, em um mesmo ambiente, integrando ainda outras ferramentas como **github**.
