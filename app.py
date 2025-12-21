@@ -93,7 +93,7 @@ def salvar_item():
     db.session.add(novo_registro)
     db.session.commit()
     return jsonify({'mensagem': 'Registro salvo com sucesso!',
-                   'ID':novo_registro.id}), 201
+                   'id':novo_registro.id}), 201
 
 
 # Rota para editar registro
