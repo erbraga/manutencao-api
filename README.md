@@ -41,7 +41,7 @@ A API foi desenvolvida na linguagem Python, utilizando o framework Flask. Para e
 <br>
 
 ## Como executar
-Após a criação e ativação do ambiente virtual a aplicação pode ser executada por meio do comando ``` flask run  ```. 
+Após a criação e ativação do ambiente virtual a aplicação pode ser executada por meio do comando ``` flask run  ``` no terminal. 
 
 <br>
 
@@ -91,7 +91,7 @@ Como a aplicação foi desenvolvida para fins acadêmicos, está hospedada em se
 |-|-|
 |Parâmetro| id => chave primária da tabela veiculos.|
 |Funcionalidade|Exclui um registro da tabela itens cuja chave primária seja igual a *id*.|
-|Retorno|200 - Registro atualizado com sucesso!<br>404 - Registro não encontrado|
+|Retorno|200 - Registro atualizado com sucesso!<br>404 - Registro não encontrado<br>500 - Registro associado a uma chave estrangeira|
 
 <br>
 
