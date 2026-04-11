@@ -27,7 +27,8 @@ with app.app_context():
 def recuperar():
     '''Retorna todo o banco de dados cadastrado.
     ---
-
+    tags:
+      - geral
     responses:
       200:
         description: Registros lidos com sucesso.
@@ -48,6 +49,8 @@ def salvar_item():
     ---
     consumes:
       - application/json
+    tags:
+      - Ítens de manutenção
     parameters:
       - in: body
         name: body
@@ -97,13 +100,15 @@ def salvar_item():
     return jsonify({'id':novo_registro.id}), 201
 
 
-# Rota para editar registro
+# Rota para editar item dew manutenção
 @app.route('/alterar-item/<int:id>', methods=['PUT'])
 def alterar_item(id):
     '''Altera um item de manutenção no banco de dados
     ---
     consumes:
       - application/json
+    tags:
+      - Ítens de manutenção
     parameters:
       - name: id
         in: path
@@ -160,7 +165,7 @@ def alterar_item(id):
     return jsonify({'200': 'Registro atualizado com sucesso!'})
 
 
-# Rota para deletar registro
+# Rota para deletar item de manutenção
 @app.route('/deletar-item/<int:id>', methods=['DELETE', 'OPTIONS'])
 #@cross_origin()
 def deletar_item(id):
@@ -168,6 +173,8 @@ def deletar_item(id):
     ---
     consumes:
       - application/json
+    tags:
+      - Ítens de manutenção
     parameters:
       - name: id
         in: path
@@ -200,6 +207,8 @@ def salvar_veiculo():
     ---
     consumes:
       - application/json
+    tags:
+      - Veículos
     parameters:
       - in: body
         name: body
@@ -233,6 +242,8 @@ def alterar_veiculo(id):
     ---
     consumes:
       - application/json
+    tags:
+      - Veículos
     parameters:
       - name: id
         in: path
@@ -272,6 +283,8 @@ def deletar_veiculo(id):
     ---
     consumes:
       - application/json
+    tags:
+      - Veículos
     parameters:
       - name: id
         in: path
@@ -301,10 +314,6 @@ def deletar_veiculo(id):
     except:
         db.session.rollback()
         return jsonify({"500": "Registro associado a uma chave estrangeira"}), 500
-
-    
-    
-
 
 if __name__ == '__main__':
     app.run(debug=True)
