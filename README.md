@@ -24,7 +24,7 @@ A API foi desenvolvida na linguagem Python, utilizando o framework Flask. Para e
     
     No Ubuntu:
     ```
-    cd ./ manutencao-api
+    cd ./ manutencao-api-main
     python3 -m venv .venv
     source ./.bin/activate
     pip install -r requirements.txt
@@ -32,7 +32,7 @@ A API foi desenvolvida na linguagem Python, utilizando o framework Flask. Para e
     
     No Windows:
     ```
-    cd manutencao-api
+    cd manutencao-api-main
     py -m venv .venv
     .venv\Scripts\activate.bat
     pip install -r requirements.txt
